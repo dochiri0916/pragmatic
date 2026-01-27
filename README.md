@@ -42,13 +42,13 @@ domain
 │   ├── InvalidRefreshTokenException.java
 │   ├── RefreshToken.java
 │   ├── RefreshTokenException.java
-│   ├── RefreshTokenExpiredException.java
 │   └── RefreshTokenNotFoundException.java
 └── user
     ├── User.java
     ├── UserRole.java
     ├── UserStatus.java
     ├── UserException.java
+    ├── UserNotActiveException.java
     ├── UserNotFoundException.java
     └── DuplicateEmailException.java
 ```
@@ -69,13 +69,16 @@ domain
 application
 ├── auth
 │   ├── command
-│   │   ├── AuthenticationService.java
-│   │   └── RefreshTokenService.java
+│   │   ├── UserAuthenticationService.java
+│   │   ├── RefreshTokenIssueService.java
+│   │   └── RevokeTokenService.java
 │   ├── dto
 │   │   └── LoginResult.java
-│   └── facade
-│       ├── LoginFacade.java
-│       └── ReissueTokenFacade.java
+│   ├── facade
+│   │   ├── LoginFacade.java
+│   │   └── ReissueTokenFacade.java
+│   └── query
+│       └── RefreshTokenQueryService.java
 └── user
     ├── command
     │   └── RegisterService.java
@@ -109,6 +112,7 @@ application
 infrastructure
 ├── config
 │   ├── JpaConfig.java
+│   ├── SchedulingConfig.java
 │   ├── SecurityConfig.java
 │   └── properties
 │       ├── CookieProperties.java
@@ -117,18 +121,23 @@ infrastructure
 ├── persistence
 │   ├── UserRepository.java
 │   └── RefreshTokenRepository.java
+├── scheduler
+│   └── RefreshTokenCleanupScheduler.java
 └── security
     ├── audit
     │   └── AuditorAwareImpl.java
     ├── cookie
-    │   └── CookieManager.java
+    │   └── CookieProvider.java
     ├── handler
     │   ├── JwtAuthenticationEntryPoint.java
     │   └── JwtAccessDeniedHandler.java
     └── jwt
         ├── JwtAuthenticationFilter.java
         ├── JwtPrincipal.java
-        └── JwtProvider.java
+        ├── JwtProvider.java
+        ├── JwtTokenGenerator.java
+        ├── JwtTokenResult.java
+        └── RefreshTokenVerifier.java
 ```
 
 ### 보안 설계 특징
@@ -136,6 +145,8 @@ infrastructure
 - SecurityContext에는 엔티티를 넣지 않는다.
   - JwtPrincipal로 최소 정보만 유지
 - JWT 파싱은 JwtProvider에서 단일 책임으로 처리
+- Application / Facade는 JwtProvider를 직접 않지 않는다
+  - JwtTokenGenerator, RefreshTokenVerifier를 통해 간접 접근
 - Refresh Token은 HttpOnly Cookie로 관리
   - CookieManager가 쿠키 생성/삭제 책임을 가짐
 - 인증 / 인가 실패 응답도 ProblemDetail 기반으로 통일
@@ -156,19 +167,21 @@ presentation
 │   ├── request
 │   │   └── LoginRequest.java
 │   └── response
-│       └── AuthResponse.java
+│   │   └── AuthResponse.java
 ├── user
 │   ├── UserController.java
 │   ├── request
 │   │   └── RegisterRequest.java
 │   └── response
-│       └── UserResponse.java
+│   │   └── UserResponse.java
 └── common
     └── exception
         ├── BaseExceptionHandler.java
         ├── GlobalExceptionHandler.java
         ├── ExceptionStatusMapper.java
         └── mapper
+            ├── AuthenticationExceptionStatusMapper.java
+            ├── RefreshTokenExceptionStatusMapper.java
             ├── DomainExceptionStatusMapper.java
             └── UserExceptionStatusMapper.java
 ```
