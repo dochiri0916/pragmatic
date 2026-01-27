@@ -34,8 +34,17 @@ public class RefreshToken extends BaseEntity {
         return refreshToken;
     }
 
+    public void update(final String token, final LocalDateTime expiresAt) {
+        this.token = token;
+        this.expiresAt = expiresAt;
+    }
+
     public boolean isExpired(final LocalDateTime now) {
         return now.isAfter(expiresAt);
+    }
+
+    public boolean isOwnedBy(final Long userId) {
+        return this.userId.equals(userId);
     }
 
 }

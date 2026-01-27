@@ -8,4 +8,6 @@ public interface UserFinder {
 
     User findActiveUserByEmail(String email);
 
+    User findByEmail(String email);
+
 }

@@ -3,7 +3,7 @@ package com.example.pragmatic.application.user.command;
 import com.example.pragmatic.domain.user.DuplicateEmailException;
 import com.example.pragmatic.domain.user.User;
 import com.example.pragmatic.infrastructure.persistence.UserRepository;
-import com.example.pragmatic.presatation.user.request.RegisterRequest;
+import com.example.pragmatic.presentation.user.request.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

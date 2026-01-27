@@ -45,4 +45,12 @@ public class User extends BaseEntity {
         return user;
     }
 
+    public void updateLastLoginAt() {
+        this.lastLoginAt = LocalDateTime.now();
+    }
+
+    public boolean isActive() {
+        return this.status == UserStatus.ACTIVE;
+    }
+
 }

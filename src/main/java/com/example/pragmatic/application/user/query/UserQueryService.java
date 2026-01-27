@@ -28,6 +28,12 @@ public class UserQueryService implements UserFinder {
                 .orElseThrow(() -> new UserNotFoundException("해당 유저를 찾을 수 없습니다: " + email));
     }
 
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("해당 유저를 찾을 수 없습니다: " + email));
+    }
+
     public User getActiveUser(Long id) {
         return findActiveUserById(id);
     }

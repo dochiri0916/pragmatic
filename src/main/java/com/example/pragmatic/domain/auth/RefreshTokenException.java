@@ -6,8 +6,4 @@ public abstract class RefreshTokenException extends RuntimeException {
         super(message);
     }
 
-    protected RefreshTokenException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
 }

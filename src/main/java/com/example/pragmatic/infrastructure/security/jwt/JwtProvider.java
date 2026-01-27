@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Component
@@ -38,6 +40,11 @@ public class JwtProvider {
                 CATEGORY_REFRESH,
                 jwtProperties.refreshExpiration()
         );
+    }
+
+    public LocalDateTime refreshTokenExpiresAt() {
+        return LocalDateTime.now()
+                .plus(jwtProperties.refreshExpiration(), ChronoUnit.MILLIS);
     }
 
     public Claims parseAndValidate(String token) {
