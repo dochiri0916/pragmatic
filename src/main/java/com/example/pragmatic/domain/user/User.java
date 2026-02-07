@@ -26,9 +26,6 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @Enumerated(EnumType.STRING)
-    private UserStatus status;
-
     private LocalDateTime lastLoginAt;
 
     public static User register(
@@ -41,7 +38,6 @@ public class User extends BaseEntity {
         user.password = requireNonNull(password);
         user.name = requireNonNull(name);
         user.role = UserRole.USER;
-        user.status = UserStatus.ACTIVE;
         return user;
     }
 
@@ -50,7 +46,7 @@ public class User extends BaseEntity {
     }
 
     public boolean isActive() {
-        return this.status == UserStatus.ACTIVE;
+        return !isDeleted();
     }
 
 }

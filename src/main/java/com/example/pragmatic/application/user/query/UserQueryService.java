@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.example.pragmatic.domain.user.UserStatus.*;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -18,13 +16,13 @@ public class UserQueryService implements UserFinder {
 
     @Override
     public User findActiveUserById(Long id) {
-        return userRepository.findByIdAndStatus(id, ACTIVE)
+        return userRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new UserNotFoundException("해당 유저를 찾을 수 없습니다: " + id));
     }
 
     @Override
     public User findActiveUserByEmail(String email) {
-        return userRepository.findByEmailAndStatus(email, ACTIVE)
+        return userRepository.findByEmailAndDeletedAtIsNull(email)
                 .orElseThrow(() -> new UserNotFoundException("해당 유저를 찾을 수 없습니다: " + email));
     }
 
