@@ -1,39 +1,59 @@
 package com.example.pragmatic.application.user.query;
 
+import com.example.pragmatic.application.user.dto.UserDetail;
 import com.example.pragmatic.domain.user.User;
 import com.example.pragmatic.domain.user.UserNotFoundException;
 import com.example.pragmatic.infrastructure.persistence.UserRepository;
+import com.example.pragmatic.presentation.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserQueryService implements UserFinder {
+@RequiredArgsConstructor
+public class UserQueryService implements UserFinder, UserLoader {
 
     private final UserRepository userRepository;
 
     @Override
-    public User findActiveUserById(Long id) {
-        return userRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new UserNotFoundException("해당 유저를 찾을 수 없습니다: " + id));
+    public Optional<User> findActiveUserById(Long id) {
+        return userRepository.findByIdAndDeletedAtIsNull(id);
     }
 
     @Override
-    public User findActiveUserByEmail(String email) {
-        return userRepository.findByEmailAndDeletedAtIsNull(email)
-                .orElseThrow(() -> new UserNotFoundException("해당 유저를 찾을 수 없습니다: " + email));
+    public Optional<User> findActiveUserByEmail(String email) {
+        return userRepository.findByEmailAndDeletedAtIsNull(email);
     }
 
     @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("해당 유저를 찾을 수 없습니다: " + email));
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
-    public User getActiveUser(Long id) {
-        return findActiveUserById(id);
+    @Override
+    public User loadActiveUserById(Long id) {
+        return findActiveUserById(id)
+                .orElseThrow(() -> UserNotFoundException.withId(id));
+    }
+
+    @Override
+    public User loadActiveUserByEmail(String email) {
+        return findActiveUserByEmail(email)
+                .orElseThrow(() -> UserNotFoundException.withEmail(email));
+    }
+
+    @Override
+    public User loadByEmail(String email) {
+        return findByEmail(email)
+                .orElseThrow(() -> UserNotFoundException.withEmail(email));
+    }
+
+    public UserDetail getActiveUser(Long userId) {
+        User user = loadActiveUserById(userId);
+        return UserDetail.from(user);
     }
 
 }

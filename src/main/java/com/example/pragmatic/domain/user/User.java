@@ -45,8 +45,4 @@ public class User extends BaseEntity {
         this.lastLoginAt = LocalDateTime.now();
     }
 
-    public boolean isActive() {
-        return !isDeleted();
-    }
-
 }

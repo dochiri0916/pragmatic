@@ -2,22 +2,13 @@ package com.example.pragmatic.presentation.common.exception.mapper;
 
 import com.example.pragmatic.domain.user.DuplicateEmailException;
 import com.example.pragmatic.domain.user.UserException;
-import com.example.pragmatic.domain.user.UserNotActiveException;
+import com.example.pragmatic.domain.user.InactiveUserException;
 import com.example.pragmatic.domain.user.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
 public class UserExceptionStatusMapper implements DomainExceptionStatusMapper {
-
-    private static final Map<Class<? extends UserException>, HttpStatus> STATUS_MAP =
-            Map.of(
-                    UserNotFoundException.class, HttpStatus.NOT_FOUND,
-                    DuplicateEmailException.class, HttpStatus.CONFLICT,
-                    UserNotActiveException.class, HttpStatus.FORBIDDEN
-            );
 
     @Override
     public boolean supports(RuntimeException exception) {
@@ -26,7 +17,16 @@ public class UserExceptionStatusMapper implements DomainExceptionStatusMapper {
 
     @Override
     public HttpStatus map(RuntimeException exception) {
-        return STATUS_MAP.getOrDefault(((UserException) exception).getClass(), HttpStatus.BAD_REQUEST);
+        if (exception instanceof UserNotFoundException) {
+            return HttpStatus.NOT_FOUND;
+        }
+        if (exception instanceof DuplicateEmailException) {
+            return HttpStatus.CONFLICT;
+        }
+        if (exception instanceof InactiveUserException) {
+            return HttpStatus.FORBIDDEN;
+        }
+        return HttpStatus.BAD_REQUEST;
     }
 
 }

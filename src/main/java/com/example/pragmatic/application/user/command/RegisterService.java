@@ -1,5 +1,6 @@
 package com.example.pragmatic.application.user.command;
 
+import com.example.pragmatic.application.user.dto.UserDetail;
 import com.example.pragmatic.domain.user.DuplicateEmailException;
 import com.example.pragmatic.domain.user.User;
 import com.example.pragmatic.infrastructure.persistence.UserRepository;
@@ -17,21 +18,22 @@ public class RegisterService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public User register(final RegisterRequest request) {
+    public UserDetail register(final RegisterRequest request) {
         checkDuplicateEmail(request.email());
 
-        return userRepository.save(
+        User user = userRepository.save(
                 User.register(
                         request.email(),
                         passwordEncoder.encode(request.password()),
                         request.name()
                 )
         );
+        return UserDetail.from(user);
     }
 
     private void checkDuplicateEmail(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new DuplicateEmailException("이미 사용중인 이메일입니다: " + email);
+            throw new DuplicateEmailException(email);
         }
     }
 
