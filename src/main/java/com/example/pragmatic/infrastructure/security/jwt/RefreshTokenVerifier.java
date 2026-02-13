@@ -15,7 +15,7 @@ public class RefreshTokenVerifier {
         Claims claims = jwtProvider.parseAndValidate(refreshToken);
 
         if (!jwtProvider.isRefreshToken(claims)) {
-            throw new InvalidRefreshTokenException("리프레시 토큰이 아닙니다.");
+            throw InvalidRefreshTokenException.invalidTokenType();
         }
 
         return jwtProvider.extractUserId(claims);
