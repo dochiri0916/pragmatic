@@ -4,7 +4,6 @@ import com.example.pragmatic.application.user.dto.UserDetail;
 import com.example.pragmatic.domain.user.User;
 import com.example.pragmatic.domain.user.UserNotFoundException;
 import com.example.pragmatic.infrastructure.persistence.UserRepository;
-import com.example.pragmatic.presentation.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

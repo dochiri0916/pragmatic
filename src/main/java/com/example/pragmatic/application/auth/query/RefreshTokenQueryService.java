@@ -10,22 +10,22 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RefreshTokenQueryService {
+@RequiredArgsConstructor
+public class RefreshTokenQueryService implements RefreshTokenLoader {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public RefreshToken getValidToken(final String token, final LocalDateTime now) {
+    @Override
+    public RefreshToken loadValidToken(String token, LocalDateTime now) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RefreshTokenNotFoundException("유효하지 않은 토큰입니다."));
+                .orElseThrow(RefreshTokenNotFoundException::new);
 
         if (refreshToken.isExpired(now)) {
-            throw new RefreshTokenNotFoundException("만료된 토큰입니다.");
+            throw new RefreshTokenNotFoundException();
         }
 
         return refreshToken;
     }
-
 
 }
