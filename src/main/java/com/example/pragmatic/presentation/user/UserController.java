@@ -1,9 +1,9 @@
 package com.example.pragmatic.presentation.user;
 
-import com.example.pragmatic.application.user.command.RegisterService;
+import com.example.pragmatic.application.user.command.RegisterUserService;
 import com.example.pragmatic.application.user.query.UserQueryService;
 import com.example.pragmatic.infrastructure.security.jwt.JwtPrincipal;
-import com.example.pragmatic.presentation.user.request.RegisterRequest;
+import com.example.pragmatic.presentation.user.request.RegisterUserRequest;
 import com.example.pragmatic.presentation.user.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,15 +19,15 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final RegisterService registerService;
+    private final RegisterUserService registerUserService;
     private final UserQueryService userQueryService;
 
     @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.")
     @ApiResponse(responseCode = "200", description = "등록 성공")
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterUserRequest request) {
         return ResponseEntity.ok(
-                UserResponse.from(registerService.register(request))
+                UserResponse.from(registerUserService.execute(request.toCommand()))
         );
     }
 

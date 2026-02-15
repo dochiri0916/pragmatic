@@ -11,7 +11,7 @@ public class JwtTokenGenerator {
 
     private final JwtProvider jwtProvider;
 
-    public JwtTokenResult generateToken(final Long userId, final String role) {
+    public JwtTokenResult generateToken(Long userId, String role) {
         String accessToken = jwtProvider.generateAccessToken(userId, role);
         String refreshToken = jwtProvider.generateRefreshToken(userId, role);
 
@@ -20,7 +20,7 @@ public class JwtTokenGenerator {
         return new JwtTokenResult(accessToken, refreshToken, refreshExpiresAt);
     }
 
-    public String generateAccessToken(final Long userId, final String role) {
+    public String generateAccessToken(Long userId, String role) {
         return jwtProvider.generateAccessToken(userId, role);
     }
 

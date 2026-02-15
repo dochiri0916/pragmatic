@@ -28,11 +28,7 @@ public class User extends BaseEntity {
 
     private LocalDateTime lastLoginAt;
 
-    public static User register(
-            final String email,
-            final String password,
-            final String name
-    ) {
+    public static User register(String email, String password, String name) {
         User user = new User();
         user.email = requireNonNull(email);
         user.password = requireNonNull(password);

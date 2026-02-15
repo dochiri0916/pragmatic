@@ -1,5 +1,6 @@
 package com.example.pragmatic.presentation.common.exception.mapper;
 
+import com.example.pragmatic.domain.auth.ExpiredRefreshTokenException;
 import com.example.pragmatic.domain.auth.InvalidRefreshTokenException;
 import com.example.pragmatic.domain.auth.RefreshTokenException;
 import com.example.pragmatic.domain.auth.RefreshTokenNotFoundException;
@@ -19,7 +20,10 @@ public class RefreshTokenExceptionStatusMapper implements DomainExceptionStatusM
         if (exception instanceof RefreshTokenNotFoundException) {
             return HttpStatus.UNAUTHORIZED;
         }
-        if  (exception instanceof InvalidRefreshTokenException) {
+        if (exception instanceof InvalidRefreshTokenException) {
+            return HttpStatus.UNAUTHORIZED;
+        }
+        if (exception instanceof ExpiredRefreshTokenException) {
             return HttpStatus.UNAUTHORIZED;
         }
         return HttpStatus.BAD_REQUEST;

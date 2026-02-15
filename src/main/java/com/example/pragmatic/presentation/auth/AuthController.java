@@ -26,21 +26,25 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse response
     ) {
-        LoginResult loginResult = loginFacade.login(request);
+        LoginResult loginResult = loginFacade.login(request.toCommand());
 
         cookieProvider.addRefreshToken(response, loginResult.refreshToken());
 
         return ResponseEntity.ok(
-                AuthResponse.from(loginResult.user(), loginResult.accessToken())
+                AuthResponse.from(loginResult.user(), loginResult.accessToken(), loginResult.refreshToken())
         );
     }
 
     @PostMapping("/reissue")
     public ResponseEntity<AuthResponse> reissue(
-            @CookieValue(name = "refreshToken") String refreshToken
+            @CookieValue(name = "refreshToken") String refreshToken,
+            HttpServletResponse response
     ) {
-        return ResponseEntity.ok(
-                reissueTokenFacade.reissue(refreshToken));
+        AuthResponse authResponse = reissueTokenFacade.reissue(refreshToken);
+
+        cookieProvider.addRefreshToken(response, authResponse.refreshToken());
+
+        return ResponseEntity.ok(authResponse);
     }
 
     @PostMapping("/logout")
