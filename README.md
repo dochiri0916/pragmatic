@@ -115,13 +115,17 @@ application
 ```text
 infrastructure
 ├── config
+│   ├── JacksonConfig.java
 │   ├── JpaConfig.java
 │   ├── SchedulingConfig.java
 │   ├── SecurityConfig.java
+│   ├── SwaggerConfig.java
+│   ├── SwaggerSecurityConfig.java
 │   └── properties
 │       ├── CookieProperties.java
 │       ├── CorsProperties.java
-│       └── JwtProperties.java
+│       ├── JwtProperties.java
+│       └── SecurityProperties.java
 ├── persistence
 │   ├── user
 │   │   ├── UserJpaRepository.java (Spring Data JPA)
@@ -140,6 +144,7 @@ infrastructure
     │   ├── JwtAuthenticationEntryPoint.java
     │   └── JwtAccessDeniedHandler.java
     └── jwt
+        ├── JwtAuthenticationConverter.java
         ├── JwtAuthenticationFilter.java
         ├── JwtPrincipal.java
         ├── JwtProvider.java
