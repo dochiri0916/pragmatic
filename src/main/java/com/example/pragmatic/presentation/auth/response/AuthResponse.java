@@ -5,19 +5,16 @@ import com.example.pragmatic.domain.user.User;
 public record AuthResponse(
         Long userId,
         String role,
-        String accessToken,
-        String refreshToken
+        String accessToken
 ) {
     public static AuthResponse from(
             User user,
-            String accessToken,
-            String refreshToken
+            String accessToken
     ) {
         return new AuthResponse(
                 user.getId(),
                 user.getRole().name(),
-                accessToken,
-                refreshToken
+                accessToken
         );
     }
 }

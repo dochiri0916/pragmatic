@@ -3,6 +3,7 @@ package com.example.pragmatic.infrastructure.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,6 +16,12 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SwaggerSecurityConfig {
+
+    @Value("${swagger.auth.username:admin}")
+    private String username;
+
+    @Value("${swagger.auth.password:admin}")
+    private String password;
 
     @Bean
     @Order(1)
@@ -30,8 +37,8 @@ public class SwaggerSecurityConfig {
     @Bean
     public UserDetailsService swaggerUserDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("admin"))
+                .username(username)
+                .password(passwordEncoder.encode(password))
                 .roles("ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(admin);

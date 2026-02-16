@@ -1,5 +1,6 @@
 package com.example.pragmatic.application.auth.facade;
 
+import com.example.pragmatic.application.auth.dto.LoginResult;
 import com.example.pragmatic.domain.auth.RefreshToken;
 import com.example.pragmatic.domain.auth.RefreshTokenRepository;
 import com.example.pragmatic.domain.user.User;
@@ -7,7 +8,6 @@ import com.example.pragmatic.domain.user.UserRepository;
 import com.example.pragmatic.infrastructure.security.jwt.JwtTokenGenerator;
 import com.example.pragmatic.infrastructure.security.jwt.JwtTokenResult;
 import com.example.pragmatic.infrastructure.security.jwt.RefreshTokenVerifier;
-import com.example.pragmatic.presentation.auth.response.AuthResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +24,7 @@ public class ReissueTokenFacade {
     private final JwtTokenGenerator jwtTokenGenerator;
 
     @Transactional
-    public AuthResponse reissue(String refreshTokenValue) {
+    public LoginResult reissue(String refreshTokenValue) {
         Long userId = refreshTokenVerifier.verifyAndExtractUserId(refreshTokenValue);
 
         RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenValue);
@@ -39,7 +39,7 @@ public class ReissueTokenFacade {
         refreshToken.rotate(tokenResult.refreshToken(), tokenResult.refreshTokenExpiresAt());
         refreshTokenRepository.save(refreshToken);
 
-        return AuthResponse.from(user, tokenResult.accessToken(), tokenResult.refreshToken());
+        return LoginResult.from(user, tokenResult.accessToken(), tokenResult.refreshToken());
     }
 
 }

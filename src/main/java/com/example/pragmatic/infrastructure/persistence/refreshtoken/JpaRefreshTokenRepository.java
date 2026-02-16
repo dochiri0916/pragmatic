@@ -32,6 +32,11 @@ public class JpaRefreshTokenRepository implements RefreshTokenRepository {
     }
 
     @Override
+    public long deleteByToken(String token) {
+        return refreshTokenJpaRepository.deleteByToken(token);
+    }
+
+    @Override
     public long deleteByExpiresAtBefore(LocalDateTime now) {
         return refreshTokenJpaRepository.deleteByExpiresAtBefore(now);
     }

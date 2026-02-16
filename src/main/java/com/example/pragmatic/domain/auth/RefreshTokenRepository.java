@@ -11,6 +11,8 @@ public interface RefreshTokenRepository {
 
     Optional<RefreshToken> findByUserId(Long userId);
 
+    long deleteByToken(String token);
+
     long deleteByExpiresAtBefore(LocalDateTime now);
 
 }

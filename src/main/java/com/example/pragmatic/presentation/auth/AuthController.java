@@ -1,6 +1,7 @@
 package com.example.pragmatic.presentation.auth;
 
 import com.example.pragmatic.application.auth.dto.LoginResult;
+import com.example.pragmatic.application.auth.command.RevokeTokenService;
 import com.example.pragmatic.application.auth.facade.LoginFacade;
 import com.example.pragmatic.application.auth.facade.ReissueTokenFacade;
 import com.example.pragmatic.infrastructure.security.cookie.CookieProvider;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,6 +22,7 @@ public class AuthController {
     private final LoginFacade loginFacade;
     private final CookieProvider cookieProvider;
     private final ReissueTokenFacade reissueTokenFacade;
+    private final RevokeTokenService revokeTokenService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
@@ -31,7 +34,7 @@ public class AuthController {
         cookieProvider.addRefreshToken(response, loginResult.refreshToken());
 
         return ResponseEntity.ok(
-                AuthResponse.from(loginResult.user(), loginResult.accessToken(), loginResult.refreshToken())
+                AuthResponse.from(loginResult.user(), loginResult.accessToken())
         );
     }
 
@@ -40,15 +43,24 @@ public class AuthController {
             @CookieValue(name = "refreshToken") String refreshToken,
             HttpServletResponse response
     ) {
-        AuthResponse authResponse = reissueTokenFacade.reissue(refreshToken);
+        LoginResult loginResult = reissueTokenFacade.reissue(refreshToken);
 
-        cookieProvider.addRefreshToken(response, authResponse.refreshToken());
+        cookieProvider.addRefreshToken(response, loginResult.refreshToken());
 
-        return ResponseEntity.ok(authResponse);
+        return ResponseEntity.ok(
+                AuthResponse.from(loginResult.user(), loginResult.accessToken())
+        );
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletResponse response) {
+    public ResponseEntity<Void> logout(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            HttpServletResponse response
+    ) {
+        if (StringUtils.hasText(refreshToken)) {
+            revokeTokenService.revokeByToken(refreshToken);
+        }
+
         cookieProvider.deleteRefreshToken(response);
         return ResponseEntity.noContent().build();
     }
