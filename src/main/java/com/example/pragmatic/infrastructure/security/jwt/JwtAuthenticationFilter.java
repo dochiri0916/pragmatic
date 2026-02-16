@@ -14,52 +14,26 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private final JwtAuthenticationConverter jwtAuthenticationConverter;
+
     private final JwtProvider jwtProvider;
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
-
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = resolveToken(request);
 
-        if (!StringUtils.hasText(token)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        try {
-            Claims claims = jwtProvider.parseAndValidate(token);
-
-            if (!jwtProvider.isAccessToken(claims)) {
-                filterChain.doFilter(request, response);
-                return;
+        if (StringUtils.hasText(token)) {
+            try {
+                UsernamePasswordAuthenticationToken authentication = jwtAuthenticationConverter.convert(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (Exception e) {
+                SecurityContextHolder.clearContext();
             }
-
-            Long userId = jwtProvider.extractUserId(claims);
-            String role = jwtProvider.extractRole(claims);
-
-            JwtPrincipal principal = new JwtPrincipal(userId, role);
-
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            principal,
-                            null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + role))
-                    );
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        } catch (Exception e) {
-            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);
@@ -74,4 +48,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         return bearerToken.substring(7);
     }
+
 }
