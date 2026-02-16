@@ -25,9 +25,9 @@ logging:
     org.hibernate.SQL: debug
 
 jwt:
-  secret: 295713f06b7aac58d9a5aa67cab86532c4a9a29afd1565491ad2242e1f950a12
-  access-expiration: 3600000
-  refresh-expiration: 1209600000
+  secret: ${JWT_SECRET:295713f06b7aac58d9a5aa67cab86532c4a9a29afd1565491ad2242e1f950a12}
+  access-expiration: ${JWT_ACCESS_EXPIRATION:3600000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:1209600000}
 
 cookie:
   access-token-name: accessToken
@@ -48,6 +48,11 @@ springdoc:
     path: /swagger-ui.html
   api-docs:
     path: /v3/api-docs
+
+swagger:
+  auth:
+    username: ${SWAGGER_AUTH_USERNAME:admin}
+    password: ${SWAGGER_AUTH_PASSWORD:admin}
 
 security:
   public-endpoints:

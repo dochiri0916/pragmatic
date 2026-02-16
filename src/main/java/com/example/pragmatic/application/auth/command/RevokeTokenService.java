@@ -16,4 +16,9 @@ public class RevokeTokenService {
         return refreshTokenRepository.deleteByExpiresAtBefore(command.now());
     }
 
+    @Transactional
+    public long revokeByToken(String token) {
+        return refreshTokenRepository.deleteByToken(token);
+    }
+
 }
