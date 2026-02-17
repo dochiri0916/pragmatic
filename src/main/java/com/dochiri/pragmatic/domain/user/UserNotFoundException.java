@@ -1,0 +1,15 @@
+package com.dochiri.pragmatic.domain.user;
+
+public class UserNotFoundException extends UserException {
+    private UserNotFoundException(String message) {
+        super(message);
+    }
+
+    public static UserNotFoundException withId(Long userId) {
+        return new UserNotFoundException("사용자를 찾을 수 없습니다: " + userId);
+    }
+
+    public static UserNotFoundException withEmail(String email) {
+        return new UserNotFoundException("사용자를 찾을 수 없습니다: " + email);
+    }
+}
