@@ -20,7 +20,7 @@
 ## 전체 패키지 구조
 
 ```text
-com.example.pragmatic
+com.dochiri.pragmatic
 ├── application
 ├── domain
 ├── infrastructure
