@@ -2,6 +2,7 @@ package com.dochiri.pragmatic.infrastructure.security.cookie;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,54 +12,39 @@ public class CookieProvider {
     private final CookieProperties cookieProperties;
 
     public void addRefreshToken(HttpServletResponse response, String refreshToken) {
-        setCookie(
-                response,
+        ResponseCookie cookie = buildCookie(
                 cookieProperties.refreshTokenName(),
                 refreshToken,
                 cookieProperties.maxAge()
         );
+        response.addHeader("Set-Cookie", cookie.toString());
     }
 
     public void deleteRefreshToken(HttpServletResponse response) {
-        setCookie(
-                response,
+        ResponseCookie cookie = buildCookie(
                 cookieProperties.refreshTokenName(),
                 "",
                 0
         );
-    }
-
-    private void setCookie(
-            HttpServletResponse response,
-            String name,
-            String value,
-            long maxAge
-    ) {
-        StringBuilder cookie = new StringBuilder();
-
-        cookie.append(name).append('=').append(value).append("; ");
-        cookie.append("Path=").append(cookieProperties.path()).append("; ");
-        cookie.append("Max-Age=").append(maxAge).append("; ");
-
-        appendIfPresent(cookie, "Domain", cookieProperties.domain());
-
-        if (cookieProperties.httpOnly()) {
-            cookie.append("HttpOnly; ");
-        }
-
-        if (cookieProperties.secure()) {
-            cookie.append("Secure; ");
-        }
-
-        appendIfPresent(cookie, "SameSite", cookieProperties.sameSite());
-
         response.addHeader("Set-Cookie", cookie.toString());
     }
 
-    private void appendIfPresent(StringBuilder cookie, String key, String value) {
-        if (value != null && !value.isBlank()) {
-            cookie.append(key).append('=').append(value).append("; ");
+    private ResponseCookie buildCookie(String name, String value, long maxAge) {
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(name, value)
+                .path(cookieProperties.path())
+                .maxAge(maxAge)
+                .httpOnly(cookieProperties.httpOnly())
+                .secure(cookieProperties.secure());
+
+        if (cookieProperties.domain() != null && !cookieProperties.domain().isBlank()) {
+            builder.domain(cookieProperties.domain());
         }
+
+        if (cookieProperties.sameSite() != null && !cookieProperties.sameSite().isBlank()) {
+            builder.sameSite(cookieProperties.sameSite());
+        }
+
+        return builder.build();
     }
 
 }

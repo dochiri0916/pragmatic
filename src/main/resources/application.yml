@@ -30,7 +30,6 @@ jwt:
   refresh-expiration: ${JWT_REFRESH_EXPIRATION:1209600000}
 
 cookie:
-  access-token-name: accessToken
   refresh-token-name: refreshToken
   domain: localhost
   path: /
