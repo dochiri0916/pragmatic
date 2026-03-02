@@ -27,7 +27,8 @@ public class JwtAuthenticationConverter {
         Long userId = jwtProvider.extractUserId(claims);
         String role = jwtProvider.extractRole(claims);
 
-        userRepository.findByIdAndDeletedAtIsNull(userId);
+        userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new BadCredentialsException("존재하지 않는 사용자입니다."));
 
         JwtPrincipal principal = new JwtPrincipal(userId, role);
 

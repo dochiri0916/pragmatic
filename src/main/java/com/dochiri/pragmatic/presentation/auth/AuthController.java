@@ -1,9 +1,8 @@
 package com.dochiri.pragmatic.presentation.auth;
 
-import com.dochiri.pragmatic.application.auth.dto.LoginResult;
 import com.dochiri.pragmatic.application.auth.command.RevokeTokenService;
-import com.dochiri.pragmatic.application.auth.facade.LoginFacade;
-import com.dochiri.pragmatic.application.auth.facade.ReissueTokenFacade;
+import com.dochiri.pragmatic.application.auth.usecase.LoginUseCase;
+import com.dochiri.pragmatic.application.auth.usecase.ReissueTokenUseCase;
 import com.dochiri.pragmatic.infrastructure.security.cookie.CookieProvider;
 import com.dochiri.pragmatic.presentation.auth.request.LoginRequest;
 import com.dochiri.pragmatic.presentation.auth.response.AuthResponse;
@@ -19,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final LoginFacade loginFacade;
+    private final LoginUseCase loginUseCase;
     private final CookieProvider cookieProvider;
-    private final ReissueTokenFacade reissueTokenFacade;
+    private final ReissueTokenUseCase reissueTokenUseCase;
     private final RevokeTokenService revokeTokenService;
 
     @PostMapping("/login")
@@ -29,12 +28,12 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse response
     ) {
-        LoginResult loginResult = loginFacade.login(request.toCommand());
+        LoginUseCase.Output output = loginUseCase.execute(request.toInput());
 
-        cookieProvider.addRefreshToken(response, loginResult.refreshToken());
+        cookieProvider.addRefreshToken(response, output.refreshToken());
 
         return ResponseEntity.ok(
-                AuthResponse.from(loginResult.user(), loginResult.accessToken())
+                AuthResponse.from(output.user(), output.accessToken())
         );
     }
 
@@ -43,12 +42,14 @@ public class AuthController {
             @CookieValue(name = "refreshToken") String refreshToken,
             HttpServletResponse response
     ) {
-        LoginResult loginResult = reissueTokenFacade.reissue(refreshToken);
+        ReissueTokenUseCase.Output output = reissueTokenUseCase.execute(
+                new ReissueTokenUseCase.Input(refreshToken)
+        );
 
-        cookieProvider.addRefreshToken(response, loginResult.refreshToken());
+        cookieProvider.addRefreshToken(response, output.refreshToken());
 
         return ResponseEntity.ok(
-                AuthResponse.from(loginResult.user(), loginResult.accessToken())
+                AuthResponse.from(output.user(), output.accessToken())
         );
     }
 
@@ -58,7 +59,7 @@ public class AuthController {
             HttpServletResponse response
     ) {
         if (StringUtils.hasText(refreshToken)) {
-            revokeTokenService.revokeByToken(refreshToken);
+            revokeTokenService.execute(new RevokeTokenService.Input(refreshToken));
         }
 
         cookieProvider.deleteRefreshToken(response);

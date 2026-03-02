@@ -5,24 +5,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-public class RevokeTokenService {
+public class CleanupExpiredTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public void execute(Input input) {
-        refreshTokenRepository.deleteByToken(input.token());
+    public long execute(Input input) {
+        return refreshTokenRepository.deleteByExpiresAtBefore(input.now());
     }
 
     public record Input(
-            String token
+            LocalDateTime now
     ) {
         public Input {
-            Objects.requireNonNull(token);
+            Objects.requireNonNull(now);
         }
     }
 

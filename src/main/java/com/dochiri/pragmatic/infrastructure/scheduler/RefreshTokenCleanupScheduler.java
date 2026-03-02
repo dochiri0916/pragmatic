@@ -1,7 +1,6 @@
 package com.dochiri.pragmatic.infrastructure.scheduler;
 
-import com.dochiri.pragmatic.application.auth.command.RevokeTokenCommand;
-import com.dochiri.pragmatic.application.auth.command.RevokeTokenService;
+import com.dochiri.pragmatic.application.auth.command.CleanupExpiredTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,11 +13,13 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class RefreshTokenCleanupScheduler {
 
-    private final RevokeTokenService revokeTokenService;
+    private final CleanupExpiredTokenService cleanupExpiredTokenService;
 
     @Scheduled(cron = "0 0 3 * * *")
     public void cleanupExpiredRefreshTokens() {
-        long deletedCount = revokeTokenService.execute(new RevokeTokenCommand(LocalDateTime.now()));
+        long deletedCount = cleanupExpiredTokenService.execute(
+                new CleanupExpiredTokenService.Input(LocalDateTime.now())
+        );
         log.info("Expired refresh tokens revoked. count={}", deletedCount);
     }
 

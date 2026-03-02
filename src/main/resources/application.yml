@@ -53,6 +53,10 @@ swagger:
   auth:
     username: ${SWAGGER_AUTH_USERNAME:admin}
     password: ${SWAGGER_AUTH_PASSWORD:admin}
+  security-matchers:
+    - /swagger-ui.html
+    - /swagger-ui/**
+    - /v3/api-docs/**
 
 security:
   public-endpoints:

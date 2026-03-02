@@ -1,6 +1,8 @@
 package com.dochiri.pragmatic.domain.auth;
 
-import com.dochiri.pragmatic.domain.BaseEntity;
+import com.dochiri.pragmatic.domain.common.exception.BaseException;
+import com.dochiri.pragmatic.domain.common.exception.ErrorCode;
+import com.dochiri.pragmatic.infrastructure.persistence.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -35,13 +37,13 @@ public class RefreshToken extends BaseEntity {
 
     public void verifyNotExpired(LocalDateTime now) {
         if (now.isAfter(expiresAt)) {
-            throw new ExpiredRefreshTokenException();
+            throw new BaseException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
     }
 
     public void verifyOwnership(Long userId) {
         if (!this.userId.equals(userId)) {
-            throw InvalidRefreshTokenException.ownerMismatch();
+            throw new BaseException(ErrorCode.REFRESH_TOKEN_OWNER_MISMATCH);
         }
     }
 

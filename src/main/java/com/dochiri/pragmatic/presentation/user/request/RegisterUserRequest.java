@@ -1,6 +1,6 @@
 package com.dochiri.pragmatic.presentation.user.request;
 
-import com.dochiri.pragmatic.application.user.command.RegisterUserCommand;
+import com.dochiri.pragmatic.application.user.command.RegisterUserService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -23,7 +23,7 @@ public record RegisterUserRequest(
         @NotBlank
         String name
 ) {
-    public RegisterUserCommand toCommand() {
-        return new RegisterUserCommand(email, password, name);
+    public RegisterUserService.Input toInput() {
+        return new RegisterUserService.Input(email, password, name);
     }
 }

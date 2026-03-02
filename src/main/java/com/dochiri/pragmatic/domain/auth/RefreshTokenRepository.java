@@ -5,13 +5,13 @@ import java.util.Optional;
 
 public interface RefreshTokenRepository {
 
-    RefreshToken save(RefreshToken refreshToken);
+    void save(RefreshToken refreshToken);
 
     RefreshToken findByToken(String token);
 
     Optional<RefreshToken> findByUserId(Long userId);
 
-    long deleteByToken(String token);
+    void deleteByToken(String token);
 
     long deleteByExpiresAtBefore(LocalDateTime now);
 

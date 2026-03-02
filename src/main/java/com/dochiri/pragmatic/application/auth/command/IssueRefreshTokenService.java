@@ -4,7 +4,9 @@ import com.dochiri.pragmatic.domain.auth.RefreshToken;
 import com.dochiri.pragmatic.domain.auth.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -12,20 +14,33 @@ public class IssueRefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    @Transactional
-    public void execute(IssueRefreshTokenCommand command) {
-        RefreshToken refreshToken = refreshTokenRepository.findByUserId(command.userId())
+    public void execute(Input input) {
+        RefreshToken refreshToken = refreshTokenRepository.findByUserId(input.userId())
+                .map(existing -> {
+                    existing.rotate(input.token(), input.expiresAt());
+                    return existing;
+                })
                 .orElseGet(() ->
                         RefreshToken.issue(
-                                command.token(),
-                                command.userId(),
-                                command.expiresAt()
+                                input.token(),
+                                input.userId(),
+                                input.expiresAt()
                         )
                 );
 
-        refreshToken.rotate(command.token(), command.expiresAt());
-
         refreshTokenRepository.save(refreshToken);
+    }
+
+    public record Input(
+            String token,
+            Long userId,
+            LocalDateTime expiresAt
+    ) {
+        public Input {
+            Objects.requireNonNull(token);
+            Objects.requireNonNull(userId);
+            Objects.requireNonNull(expiresAt);
+        }
     }
 
 }

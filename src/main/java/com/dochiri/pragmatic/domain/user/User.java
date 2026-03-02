@@ -1,6 +1,6 @@
 package com.dochiri.pragmatic.domain.user;
 
-import com.dochiri.pragmatic.domain.BaseEntity;
+import com.dochiri.pragmatic.infrastructure.persistence.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

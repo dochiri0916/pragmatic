@@ -4,7 +4,8 @@ import com.dochiri.pragmatic.application.user.command.RegisterUserService;
 import com.dochiri.pragmatic.application.user.query.UserQueryService;
 import com.dochiri.pragmatic.infrastructure.security.jwt.JwtPrincipal;
 import com.dochiri.pragmatic.presentation.user.request.RegisterUserRequest;
-import com.dochiri.pragmatic.presentation.user.response.UserResponse;
+import com.dochiri.pragmatic.presentation.user.response.ActiveUserResponse;
+import com.dochiri.pragmatic.presentation.user.response.RegisterUserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,29 +26,29 @@ public class UserController {
     @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.")
     @ApiResponse(responseCode = "200", description = "등록 성공")
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterUserRequest request) {
+    public ResponseEntity<RegisterUserResponse> register(@Valid @RequestBody RegisterUserRequest request) {
         return ResponseEntity.ok(
-                UserResponse.from(registerUserService.execute(request.toCommand()))
+                RegisterUserResponse.of(registerUserService.execute(request.toInput()))
         );
     }
 
     @Operation(summary = "내 정보 조회", description = "현재 로그인한 사용자의 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getMe(
+    public ResponseEntity<ActiveUserResponse> getMe(
             @Parameter(hidden = true) @AuthenticationPrincipal JwtPrincipal principal
     ) {
         return ResponseEntity.ok(
-                UserResponse.from(userQueryService.getActiveUser(principal.userId()))
+                ActiveUserResponse.of(userQueryService.getActiveUser(principal.userId()))
         );
     }
 
     @Operation(summary = "사용자 조회", description = "ID로 사용자를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getActiveUser(@Parameter(description = "사용자 ID") @PathVariable Long id) {
+    public ResponseEntity<ActiveUserResponse> getActiveUser(@Parameter(description = "사용자 ID") @PathVariable Long id) {
         return ResponseEntity.ok(
-                UserResponse.from(userQueryService.getActiveUser(id))
+                ActiveUserResponse.of(userQueryService.getActiveUser(id))
         );
     }
 

@@ -1,10 +1,9 @@
 package com.dochiri.pragmatic.infrastructure.security.jwt;
 
-import com.dochiri.pragmatic.infrastructure.config.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -14,7 +13,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Component
-@RequiredArgsConstructor
 public class JwtProvider {
 
     private static final String CLAIM_ROLE = "role";
@@ -23,6 +21,18 @@ public class JwtProvider {
     private static final String CATEGORY_REFRESH = "refresh";
 
     private final JwtProperties jwtProperties;
+    private SecretKey signingKey;
+
+    public JwtProvider(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+    }
+
+    @PostConstruct
+    private void init() {
+        this.signingKey = Keys.hmacShaKeyFor(
+                jwtProperties.secret().getBytes(StandardCharsets.UTF_8)
+        );
+    }
 
     public String generateAccessToken(Long userId, String role) {
         return generateToken(
@@ -49,7 +59,7 @@ public class JwtProvider {
 
     public Claims parseAndValidate(String token) {
         return Jwts.parser()
-                .verifyWith(signingKey())
+                .verifyWith(signingKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -89,14 +99,8 @@ public class JwtProvider {
                 .claim(CLAIM_CATEGORY, category)
                 .issuedAt(new Date(now))
                 .expiration(new Date(now + expirationMillis))
-                .signWith(signingKey())
+                .signWith(signingKey)
                 .compact();
-    }
-
-    private SecretKey signingKey() {
-        return Keys.hmacShaKeyFor(
-                jwtProperties.secret().getBytes(StandardCharsets.UTF_8)
-        );
     }
 
 }

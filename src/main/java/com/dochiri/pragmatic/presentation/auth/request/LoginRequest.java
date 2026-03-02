@@ -1,9 +1,10 @@
 package com.dochiri.pragmatic.presentation.auth.request;
 
-import com.dochiri.pragmatic.application.auth.command.LoginCommand;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
+import com.dochiri.pragmatic.application.auth.usecase.LoginUseCase;
 
 public record LoginRequest(
         @Email
@@ -13,7 +14,7 @@ public record LoginRequest(
         @NotBlank
         String password
 ) {
-    public LoginCommand toCommand() {
-        return new LoginCommand(email, password);
+    public LoginUseCase.Input toInput() {
+        return new LoginUseCase.Input(email, password);
     }
 }
